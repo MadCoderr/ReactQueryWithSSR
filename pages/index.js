@@ -1,59 +1,49 @@
-import Head from 'next/head';
-import styles from '../styles/Home.module.css';
+import Image from 'next/image';
 
-export default function Home() {
+export default function Home({ pokemons }) {
+  const getImageUrl = (_url) => {
+    const id = _url
+      .split('/')
+      .filter((str) => str !== '')
+      .pop();
+
+    const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+
+    return imageUrl;
+  };
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-      </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+    <div>
+      {pokemons.map((pokemon, i) => (
+        <div key={i}>
+          <Image
+            src={getImageUrl(pokemon.url)}
+            alt={pokemon.name}
+            width={150}
+            height={150}
+          />
+          <p>{pokemon.name}</p>
         </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a href="https://next.new" target="_blank" rel="noopener noreferrer">
-          Created with&nbsp;<b>next.new</b>&nbsp;⚡️
-        </a>
-      </footer>
+      ))}
     </div>
   );
+}
+
+export async function getServerSideProps({ res, req }) {
+  res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=10, stale-while-revalidate=59'
+  );
+
+  const response = await fetch('https://pokeapi.co/api/v2/pokemon');
+
+  let pokemons = [];
+  if (response.status === 200) {
+    const { results } = await response.json();
+    pokemons = results;
+  }
+
+  return {
+    props: { pokemons },
+  };
 }
