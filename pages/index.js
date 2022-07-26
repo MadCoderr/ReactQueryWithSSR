@@ -13,9 +13,9 @@ export default function Home({ pokemons }) {
   };
 
   return (
-    <div>
+    <div className="grid">
       {pokemons.map((pokemon, i) => (
-        <div key={i}>
+        <div key={i} className="card">
           <Image
             src={getImageUrl(pokemon.url)}
             alt={pokemon.name}
@@ -30,10 +30,10 @@ export default function Home({ pokemons }) {
 }
 
 export async function getServerSideProps({ res, req }) {
-  res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=10, stale-while-revalidate=59'
-  );
+  // res.setHeader(
+  //   'Cache-Control',
+  //   'public, s-maxage=10, stale-while-revalidate=59'
+  // );
 
   const response = await fetch('https://pokeapi.co/api/v2/pokemon');
 
