@@ -1,30 +1,39 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Home({ pokemons }) {
-  const getImageUrl = (_url) => {
+  const getImageUrl = (_id) => {
+    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${_id}.png`;
+  };
+
+  const getId = (_url) => {
     const id = _url
       .split('/')
       .filter((str) => str !== '')
       .pop();
 
-    const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
-
-    return imageUrl;
+    return id;
   };
 
   return (
     <div className="grid">
-      {pokemons.map((pokemon, i) => (
-        <div key={i} className="card">
-          <Image
-            src={getImageUrl(pokemon.url)}
-            alt={pokemon.name}
-            width={150}
-            height={150}
-          />
-          <p>{pokemon.name}</p>
-        </div>
-      ))}
+      {pokemons.map((pokemon) => {
+        const id = getId(pokemon.url);
+
+        return (
+          <Link key={id} href={`/pokemon/${id}`}>
+            <a className="card">
+              <Image
+                src={getImageUrl(id)}
+                alt={pokemon.name}
+                width={150}
+                height={150}
+              />
+              <p>{pokemon.name}</p>
+            </a>
+          </Link>
+        );
+      })}
     </div>
   );
 }
